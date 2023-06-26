@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.GridView
 import android.widget.ImageView
@@ -438,11 +439,20 @@ open class List() : UIView<ListView>() {
     }
 }
 
-open class WebView(var url: String) : UIView<WebView>() {
+
+open class TextInput(val placeholder: String) : UIView<EditText>() {
+    override fun setup(context: Context): EditText {
+        val editText = EditText(context)
+        editText.hint = placeholder
+        return editText
+    }
+}
+
+open class WebView(var url: String, private val javaScriptEnabled: Boolean=false) : UIView<WebView>() {
     override fun setup(context: Context): android.webkit.WebView {
         val webView = android.webkit.WebView(context)
         webView.webViewClient= WebViewClient()
-        webView.settings.javaScriptEnabled = true
+        webView.settings.javaScriptEnabled = javaScriptEnabled
         webView.loadUrl(url)
         return webView
     }
