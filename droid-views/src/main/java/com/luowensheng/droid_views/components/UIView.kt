@@ -9,6 +9,7 @@ import android.net.Uri
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
@@ -275,7 +276,7 @@ open class Stack: UIView<LinearLayout> {
                 }
             }
         }
-        children.forEach { view -> view.shouldDisplay.onUpdate { drawChildren() }  }
+        children.forEach { view -> view.shouldDisplay.onUpdate { if (it) drawChildren() }  }
         drawChildren()
         return linearLayout
     }
@@ -440,10 +441,20 @@ open class List() : UIView<ListView>() {
 }
 
 
-open class TextInput(val placeholder: String) : UIView<EditText>() {
+open class TextInput(private val placeholder: String, private val onSubmit: ((String)->Unit)?=null) : UIView<EditText>() {
     override fun setup(context: Context): EditText {
         val editText = EditText(context)
         editText.hint = placeholder
+        if (onSubmit!=null){
+            editText.setOnEditorActionListener { it, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    onSubmit.invoke(it.text.toString())
+                    true
+                } else {
+                    false
+                }
+            }
+        }
         return editText
     }
 }
